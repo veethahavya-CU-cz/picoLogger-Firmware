@@ -1,4 +1,3 @@
-from micropython import const
 from machine import Pin, ADC, PWM
 from machine import SPI, I2C
 from machine import UART
