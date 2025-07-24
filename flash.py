@@ -1,94 +1,44 @@
-from subprocess import run
-from os import path, remove
-from picoconfig import picoConfig
+import subprocess
+import sys
 
-# --- Config ---
-mpy_ver = '1.25'
-DEBUG = True
+logfile = 'flash.log'
 
-CONFIG = picoConfig()
-CONFIG.ID = 1
-CONFIG.TIM.interval = (15, 'M')
-CONFIG.HW.sLED.R, CONFIG.HW.sLED.G, CONFIG.HW.sLED.B = 18, 19, 20
-CONFIG.to_json('picoLogger.json')
+def run(cmd, show_output=False):
+    print(f"Running: {cmd}")
+    with open(logfile, 'a') as log:
+        log.write(f"\n>>> {cmd}\n")
+        if show_output:
+            proc = subprocess.run(cmd, shell=True)
+        else:
+            proc = subprocess.run(cmd, shell=True, stdout=log, stderr=log)
+        if proc.returncode != 0:
+            print(f"❌ Command failed: {cmd}. Check {logfile}")
+            sys.exit(proc.returncode)
 
-# --- Initialization ---
-open('flash_cmds.log', 'w').close()  # Clear previous log
-open('flash.log', 'w').close()       # Clear previous log
-open('flash.err', 'w').close()       # Clear previous error log
+# Clear log at start
+with open(logfile, 'w') as log:
+    log.write("Flash log\n==========\n")
 
-# --- Paths ---
-dI = {
-    'src': path.join('.', 'src'),
-    'lib': path.join('.', 'lib'),
-    'pL_': path.join('.', 'src', 'picologger.py'),
-    'pL': path.join('.', 'src', 'picologger.mpy'),
-    'pC': path.join('.', 'picoLogger.json'),
-    'main': path.join('.', 'src', 'main.py')
-}
-dO = {
-    'root': ':',
-    'lib': ':lib',
-    'config': ':.config',
-    'pL': ':lib/picologger.mpy',
-    'pC': ':.config/picoLogger.json'
-}
-libs = ['ads1115.py', 'ds3231.py', 'sdcard.py']
+# Commands
+run("mpremote mip install os-path datetime")
 
-# --- Utility Functions ---
-def log_cmd(cmd):
-    if DEBUG:
-        with open('flash_cmds.log', 'a') as f:
-            f.write(' '.join(cmd) + '\n')
+src_files = ['src\\picologger.py', 'src\\config.py']
+lib_files = ['lib\\sled.py', 'lib\\logging.py', 'lib\\sdcard.py', 'lib\\ds3231.py', 'lib\\ads1115.py']
 
-def run_cmd(cmd, **kwargs):
-    log_cmd(cmd)
-    run(cmd, **kwargs)
+for f in src_files:
+    out = f.replace('src\\', 'bin\\').replace('.py', '.mpy')
+    run(f"mpy-cross -v -c 1.25 -march=armv6m -O3 {f} -o {out}")
 
-def compile_and_copy(src, dest, log_out, log_err):
-    compiled = src.replace('.py', '.mpy')
-    run_cmd(['mpy-cross', '-v', '-c', mpy_ver, '-march=armv6m', '-O3', src, '-o', compiled], check=True, stdout=log_out, stderr=log_err)
-    run_cmd(['mpremote', 'rm', dest], stdout=log_out, stderr=log_err)
-    run_cmd(['mpremote', 'cp', compiled, dest], check=True, stdout=log_out, stderr=log_err)
-    remove(compiled)
+for f in lib_files:
+    out = f.replace('lib\\', 'bin\\').replace('.py', '.mpy')
+    run(f"mpy-cross -v -c 1.25 -march=armv6m -O3 {f} -o {out}")
 
-def create_and_copy_config(src, dest, log_out, log_err):
-    run_cmd(['mpremote', 'mkdir', dO['config']], stdout=log_out, stderr=log_err)
-    run_cmd(['mpremote', 'rm', dest], stdout=log_out, stderr=log_err)
-    run_cmd(['mpremote', 'cp', src, dest], check=True, stdout=log_out, stderr=log_err)
-    remove(src)
+bin_files = [f.replace('lib\\', 'bin\\').replace('src\\', 'bin\\').replace('.py', '.mpy') for f in lib_files + src_files]
+bin_list = ' '.join(bin_files)
+run(f"mpremote cp {bin_list} :lib/")
 
-def set_rtc():
-    try:
-        run_cmd(['mpremote', 'rtc', '--set'], check=True)
-    except:
-        raise RuntimeError("Failed to connect to device!")
+run("mpremote rtc --set")
+run("mpremote cp src\\main.py :main.py")
 
-# --- Main ---
-if __name__ == "__main__":
-    with open('flash.log', 'w') as log_out, open('flash.err', 'w') as log_err:
-        print("Setting Machine RTC")
-        set_rtc()
-
-        print("Installing micropython libraries")
-        run_cmd(['mpremote', 'mkdir', dO['lib']], stdout=log_out, stderr=log_err)
-
-        for lib in libs:
-            src = path.join(dI['lib'], lib)
-            dest = dO['lib'] + '/' + lib.replace('.py', '.mpy')
-            compile_and_copy(src, dest, log_out, log_err)
-        
-        run_cmd(['mpremote', 'mip', 'install', 'os-path'], stdout=log_out, stderr=log_err, check=True)
-        run_cmd(['mpremote', 'mip', 'install', 'datetime'], stdout=log_out, stderr=log_err, check=True)
-
-        print("Compiling and copying over picoLogger")
-        compile_and_copy(dI['pL_'], dO['pL'], log_out, log_err)
-        create_and_copy_config(dI['pC'], dO['pC'], log_out, log_err)
-        
-        print("Setting up picoLogger on the device")
-        cmd = 'mpremote exec "from picologger import picoLogger; picoLogger(\\"/.config/picoLogger.json\\")"'
-        log_cmd(cmd.strip())
-        run(cmd, shell=True, check=True)
-
-        run_cmd(['mpremote', 'cp', dI['main'], ':main.py'], check=True, stdout=log_out, stderr=log_err)
-        print("Flash completed successfully!\nDisconnect the device and reset it to run the new firmware.")
+# Show output for final command
+run('mpremote exec "from picologger import picoLogger; datalogger = picoLogger(); datalogger.setup()"', show_output=True)

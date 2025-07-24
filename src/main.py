@@ -1,53 +1,36 @@
 from machine import Pin
-from picologger import picoLogger, FN_PIN, _sLED_
+from picologger import picoLogger
 
-def main():
-    """Main execution function - optimized for compatibility"""
-    # Function switch check
-    fn_pin = Pin(FN_PIN, Pin.IN)
-    
-    if fn_pin.value():
-        # Logging mode - normal operation
-        try:
-            logger = picoLogger()
-            
-            # Record data
-            success, msg = logger.record()
-            if not success:
-                return False, f"Record failed: {msg}"
-            
-            # Update timing
-            success, msg = logger.update()
-            if not success:
-                return False, f"Update failed: {msg}"
-            
-            # Deactivate and sleep
-            success, msg = logger.deactivate()
-            if not success:
-                return False, f"Deactivate failed: {msg}"
-            
-            # Sleep until next recording
-            logger.sleep()
-            return True, "Normal operation completed"
-            
-        except Exception as e:
-            return False, f"Logger error: {str(e)}"
-    else:
-        # UART terminal mode (placeholder)
-        try:
-            sled = _sLED_()
-            sled.flash('white', n=5)
-            return True, "UART mode - not implemented"
-        except:
-            return True, "UART mode - LED failed"
 
-if __name__ == "__main__":
-    success, message = main()
-    if not success:
-        print(f"ERROR: {message}")
-        # Flash red LED to indicate error
-        try:
-            sled = _sLED_()
-            sled.flash('red', n=10)
-        except:
-            pass
+datalogger = picoLogger()
+if datalogger.FN.value():
+    # Datalogger Mode
+    # Activate
+    STATUS, MSG = datalogger.activate()
+    if not STATUS:
+        print(f"ERROR: {MSG}")
+    # Record
+    STATUS, MSG = datalogger.record()
+    if not STATUS:
+        print(f"ERROR: {MSG}")
+    # Update
+    STATUS, MSG = datalogger.update()
+    if not STATUS:
+        print(f"ERROR: {MSG}")
+    # Deactivate
+    STATUS, MSG = datalogger.deactivate()
+    if not STATUS:
+        print(f"ERROR: {MSG}")
+    # Sleep
+    datalogger.sleep()
+else:
+    # UART Terminal Mode
+    try:
+        datalogger._init_PWR(turn_on=True)
+        datalogger.led.on('white')
+        print("NotImplemented: UART terminal mode")
+    except KeyboardInterrupt:
+        print("Exiting...")
+        datalogger.led.off()
+    except Exception as e:
+        datalogger.led.on('red')
