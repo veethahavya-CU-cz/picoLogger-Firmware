@@ -171,9 +171,8 @@ class picoLogger():
         self.log.info("PicoLogger set-up successfully")
         self.led.off()
         self.log.debug("Deactivating picoLogger")
+        self.log.info("PicoLogger is ready for deployment!")
         self.deactivate()
-        self.log.debug("PicoLogger deactivated successfully")
-        self.log.info("PicoLogger is ready for deployment")
         print("PicoLogger is ready for deployment")
         if not self.FN.value():
             print("WARNING: Function Toggle is OFF. To record data, please toggle the Function button ON.")
@@ -314,6 +313,8 @@ class picoLogger():
         self.log.debug("Updating PicoLogger state")
         self._get_next_record_time()
         self.log.info("Next record time is at {}".format(str(self.next_record_time_dt)))
+        sleep_time = self._ms_to_next_record()
+        self.log.debug("Sleeping for {} ms until next record".format(sleep_time))
         self.led.off()
         return True, ""
 
@@ -344,5 +345,6 @@ class picoLogger():
     
     def sleep(self):
         sleep_time = self._ms_to_next_record()
-        pause_ms(50) # Wait for any pending operations to complete
+        collect_garbage()
+        pause_ms(250) # Wait for any pending operations to complete
         deepsleep(sleep_time)
