@@ -1,6 +1,6 @@
 from micropython import const
 
-REC_IVL = const(300)
+REC_IVL = const(900)
 
 LOG_LEVEL = 'DEBUG'
 UART_ID = const(0)

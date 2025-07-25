@@ -53,7 +53,7 @@ class picoLogger():
             self.PWR.on()
         # Wait for power rail to stabilise
         pause_ms(50)
-        self.log.info("Powered Rail turned ON")
+        self.log.info("Power Rail turned ON")
 
     def _init_SD(self):
         self.log.debug("Initialising SD card")
@@ -93,7 +93,7 @@ class picoLogger():
         if set_from_machine:
             self.log.debug("Setting RTC time to Machine time")
             self.eRTC.datetime(localtime()[:6])
-            self.log.info("RTC time set to Machine time")
+            self.log.debug("RTC time set to Machine time")
         return True, ""
     
     def _init_eADC(self):
@@ -346,5 +346,5 @@ class picoLogger():
     def sleep(self):
         sleep_time = self._ms_to_next_record()
         collect_garbage()
-        pause_ms(250) # Wait for any pending operations to complete
+        pause_ms(50) # Wait for any pending operations to complete
         deepsleep(sleep_time)
