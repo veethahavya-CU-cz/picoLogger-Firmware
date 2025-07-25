@@ -68,7 +68,16 @@ def list_entries(base=':'):
     Returns:
         tuple: (files, directories) lists
     """
-    result = safe_run(['mpremote', 'resume', 'ls', base])
+    # Skip trying to list certain problematic directories
+    skip_paths = [':sd/System Volume Information', ':sd/$RECYCLE.BIN']
+    if base in skip_paths or any(base.startswith(path) for path in skip_paths):
+        return [], []
+    
+    result = safe_run(['mpremote', 'resume', 'ls', base], fatal=False)
+    if result.returncode != 0:
+        # If listing fails, return empty lists and continue
+        return [], []
+        
     lines = result.stdout.strip().splitlines()
     files, dirs = [], []
     
@@ -97,11 +106,19 @@ def list_all(path=':'):
     Returns:
         tuple: (all_files, all_directories) lists
     """
+    # Define directories to skip during scanning
+    skip_prefixes = [':sd/System Volume Information', ':sd/$RECYCLE.BIN', ':sd/System']
+    
     all_files, all_dirs = [], []
     files, dirs = list_entries(path)
     all_files.extend(files)
     
     for d in dirs:
+        # Skip scanning Windows system directories and other protected dirs
+        if any(d.startswith(prefix) for prefix in skip_prefixes):
+            all_dirs.append(d)  # Still add to list but don't scan contents
+            continue
+            
         sub_files, sub_dirs = list_all(d)
         all_files.extend(sub_files)
         all_dirs.extend(sub_dirs)
@@ -202,7 +219,7 @@ if BACKUP:
 # File cleanup process
 print_banner("File Cleanup", "-")
 protected_files = [':main.py']
-protected_prefixes = [':sd/System', ':lib/', ':os']
+protected_prefixes = [':sd/System Volume Information', ':sd/$RECYCLE.BIN', ':sd/System', ':lib/', ':os']
 files_to_delete = []
 files_protected = []
 
@@ -231,7 +248,7 @@ else:
 # Directory cleanup process
 print_banner("Directory Cleanup", "-")
 protected_dirs = [':sd/', ':lib/', ':os/']
-protected_dir_prefixes = [':sd/System', ':lib/', ':os/']
+protected_dir_prefixes = [':sd/System Volume Information', ':sd/$RECYCLE.BIN', ':sd/System', ':lib/', ':os/']
 dirs_to_delete = []
 dirs_protected = []
 
