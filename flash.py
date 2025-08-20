@@ -32,13 +32,14 @@ def log_command(cmd):
     with open(LOGFILE, 'a', encoding='utf-8') as log:
         log.write(f"\n[{timestamp}] >>> {cmd}\n")
 
-def run(cmd, show_output=False):
+def run(cmd, show_output=False, check_for_errors=False):
     """
     Execute a shell command with proper logging and error handling.
     
     Args:
         cmd (str): Command to execute
         show_output (bool): Whether to show output in console
+        check_for_errors (bool): Whether to check output for ERROR messages
     """
     print(f"🔄 Running: {cmd}")
     log_command(cmd)
@@ -55,18 +56,29 @@ def run(cmd, show_output=False):
                 log.write(proc.stderr)
         
         # Display output to console and collect warnings
+        error_found = False
         if proc.stdout:
             output_lines = proc.stdout.rstrip().split('\n')
             for line in output_lines:
                 if line.strip().startswith('WARNING:'):
                     warnings_found.append(line.strip())
+                elif check_for_errors and 'ERROR:' in line:
+                    error_found = True
                 print(line)
         if proc.stderr:
             stderr_lines = proc.stderr.rstrip().split('\n')
             for line in stderr_lines:
                 if line.strip().startswith('WARNING:'):
                     warnings_found.append(line.strip())
+                elif check_for_errors and 'ERROR:' in line:
+                    error_found = True
                 print(line)
+        
+        # Check for errors in output if requested
+        if check_for_errors and error_found:
+            print(f"❌ Command output contains errors: {cmd}")
+            print(f"📋 Check {LOGFILE} for details")
+            sys.exit(1)
     else:
         # Standard logging without console output
         with open(LOGFILE, 'a', encoding='utf-8') as log:
@@ -105,12 +117,15 @@ run("mpremote mip install os-path datetime")
 src_files = [os.path.join('src', 'picologger.py'), os.path.join('src', 'config.py')]
 lib_files = [os.path.join('lib', 'sled.py'), os.path.join('lib', 'logging.py'), os.path.join('lib', 'sdcard.py'), os.path.join('lib', 'ds3231.py'), os.path.join('lib', 'ads1115.py')]
 
+if not os.path.exists('bin'):
+    os.makedirs('bin')
 print_banner("Compiling Source Files", "-")
 print(f"📁 Compiling {len(src_files)} source files...")
 for i, f in enumerate(src_files, 1):
     out = f.replace('src' + os.sep, 'bin' + os.sep).replace('.py', '.mpy')
     print(f"  [{i}/{len(src_files)}] {os.path.basename(f)} → {os.path.basename(out)}")
     run(f"mpy-cross -v -c {COMPILE_VERSION} -march={COMPILE_ARCH} -O{OPTIMIZATION_LEVEL} {f} -o {out}")
+
 
 print_banner("Compiling Library Files", "-")
 print(f"📚 Compiling {len(lib_files)} library files...")
@@ -137,7 +152,7 @@ run(f"mpremote cp {os.path.join('src', 'main.py')} :main.py")
 # Initialize and test the logger
 print_banner("Testing Logger Setup", "-")
 print("🧪 Initializing and testing picoLogger...")
-run('mpremote exec "from picologger import picoLogger; datalogger = picoLogger(); datalogger.setup()"', show_output=True)
+run('mpremote exec "from picologger import picoLogger; datalogger = picoLogger(); datalogger.setup()"', show_output=True, check_for_errors=True)
 
 print_banner("Flash Process Complete! 🎉")
 
