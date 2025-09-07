@@ -5,8 +5,8 @@ REC_IVL = const(900)
 LOG_LEVEL = 'DEBUG'
 UART_ID = const(0)
 UART_BAUD = const(9600)
-UART_TX = const(0)
-UART_RX = const(1)
+UART_TX = const(12)
+UART_RX = const(13)
 
 SLED_R = const(20)
 SLED_G = const(19)

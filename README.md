@@ -1,6 +1,6 @@
 ## picoLogger Firmware
 
-This repository contains the MicroPython firmware for the picoLogger, the data acquisition and logging system at the heart of the picoSMS (pico Soil Moisture Station). The picoLogger is a low-cost, open-source, and robust datalogger designed for long-term, off-grid measurement of soil moisture and temperature; however, other sensors can be integrated as needed over the free I2C/SPI buses or via the three free ADC and the 12 free GPIO pins. Additionally, multiplexers can be used to further expand the number of sensors connected.
+This repository contains the MicroPython firmware for the picoLogger, the data acquisition and logging system at the heart of the picoSMS (pico Soil Moisture Station). The picoLogger is a low-cost, open-source, and robust datalogger designed for long-term, off-grid measurement of soil moisture and temperature; however, other sensors can be integrated as needed over the free I2C/SPI buses or via the three free ADC and the 10 free GPIO pins. Additionally, multiplexers can be used to further expand the number of sensors connected.
 
 This work is part of a scientific publication and is designed to be reproducible. For a comprehensive overview of the hardware, software, and experimental validation, please refer to the associated manuscript.
 
@@ -27,8 +27,6 @@ The picoLogger integrates several key components to achieve its functionality:
     - Low-Cost Soil Moisture Sensor (LCSMS)
     - DS18B20 Temperature Sensor (STS)
 
-For a detailed bill of materials, assembly instructions, and schematics, please see Appendix A of the manuscript.
-
 ### Software Architecture
 
 The firmware is organized into a modular structure for clarity and ease of modification.
@@ -52,14 +50,14 @@ The following table details the default wiring connections between the Raspberry
 | GP5                   | MicroSD Card Module | CS (Chip Select)    |                                          |
 | GP6 (I2C1 SDA)        | ADS1115 ADC Module  | SDA                 | I2C Bus 1 for Analog-to-Digital Converter|
 | GP7 (I2C1 SCL)        | ADS1115 ADC Module  | SCL                 | I2C Bus 1 for Analog-to-Digital Converter|
+| GP12 (UART0 TX)       | Debugging           | TX                  | UART for debugging output                |
+| GP13 (UART0 RX)       | Debugging           | RX                  | UART for debugging output                |
 | GP14                  | DS18B20 STS         | Data                | One-Wire interface for temperature sensors|
 | GP15                  | Function Toggle     | Switch Pin          | Toggles data recording ON/OFF            |
 | GP18                  | Status LED          | Blue Cathode        |                                          |
 | GP19                  | Status LED          | Green Cathode       |                                          |
 | GP20                  | Status LED          | Red Cathode         |                                          |
 | GP21                  | Power Control       | MOSFET Gate         | Switches power to sensors and modules    |
-
-**Note on UART:** The default configuration also specifies `UART0` on `GP0` (TX) and `GP1` (RX) for debugging purposes. This shares pins with the `DS3231 RTC` on `I2C0`. While both can be defined, they cannot be used simultaneously in this configuration. The primary function is the RTC, while the UART is for debugging and can be re-assigned in `src/config.py` if needed.
 
 ### Usage
 
