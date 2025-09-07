@@ -1,8 +1,8 @@
 ## picoLogger Firmware
 
-This repository contains the MicroPython firmware for the picoLogger, the data acquisition and logging system at the heart of the picoSMS (pico Soil Moisture Sensor). The picoLogger is a low-cost, open-source, and robust monitoring station designed for long-term, off-grid measurement of soil moisture and temperature.
+This repository contains the MicroPython firmware for the picoLogger, the data acquisition and logging system at the heart of the picoSMS (pico Soil Moisture Station). The picoLogger is a low-cost, open-source, and robust datalogger designed for long-term, off-grid measurement of soil moisture and temperature; however, other sensors can be integrated as needed over the free I2C/SPI buses or via the three free ADC and the 12 free GPIO pins. Additionally, multiplexers can be used to further expand the number of sensors connected.
 
-This work is part of a scientific publication and is designed to be highly reproducible. For a comprehensive overview of the hardware, software, and experimental validation, please refer to the associated manuscript.
+This work is part of a scientific publication and is designed to be reproducible. For a comprehensive overview of the hardware, software, and experimental validation, please refer to the associated manuscript.
 
 ### Features
 
