@@ -40,24 +40,24 @@ The firmware is organized into a modular structure for clarity and ease of modif
 
 The following table details the default wiring connections between the Raspberry Pi Pico and the peripheral modules. These connections are defined in `src/config.py` and can be modified to suit different hardware configurations.
 
-| Raspberry Pi Pico Pin | Module              | Pin/Function        | Notes                                    |
-| --------------------- | ------------------- | ------------------- | ---------------------------------------- |
-| GP0 (I2C0 SDA)        | DS3231 RTC Module   | SDA                 | I2C Bus 0 for Real-Time Clock            |
-| GP1 (I2C0 SCL)        | DS3231 RTC Module   | SCL                 | I2C Bus 0 for Real-Time Clock            |
-| GP2 (SPI0 SCK)        | MicroSD Card Module | SCK                 | SPI Bus 0 for SD Card                    |
-| GP3 (SPI0 MOSI)       | MicroSD Card Module | MOSI                | SPI Bus 0 for SD Card                    |
-| GP4 (SPI0 MISO)       | MicroSD Card Module | MISO                | SPI Bus 0 for SD Card                    |
-| GP5                   | MicroSD Card Module | CS (Chip Select)    |                                          |
-| GP6 (I2C1 SDA)        | ADS1115 ADC Module  | SDA                 | I2C Bus 1 for Analog-to-Digital Converter|
-| GP7 (I2C1 SCL)        | ADS1115 ADC Module  | SCL                 | I2C Bus 1 for Analog-to-Digital Converter|
-| GP12 (UART0 TX)       | Debugging           | TX                  | UART for debugging output                |
-| GP13 (UART0 RX)       | Debugging           | RX                  | UART for debugging output                |
-| GP14                  | DS18B20 STS         | Data                | One-Wire interface for temperature sensors|
-| GP15                  | Function Toggle     | Switch Pin          | Toggles data recording ON/OFF            |
-| GP18                  | Status LED          | Blue Cathode        |                                          |
-| GP19                  | Status LED          | Green Cathode       |                                          |
-| GP20                  | Status LED          | Red Cathode         |                                          |
-| GP21                  | Power Control       | MOSFET Gate         | Switches power to sensors and modules    |
+| RPi Pico Pin | Module              | Pin/Function        | Notes                                    |
+| ------------- | ------------------- | ------------------- | ---------------------------------------- |
+| GP0 (I2C0 SDA) | DS3231 RTC Module   | SDA                 | I2C Bus 0 for Real-Time Clock            |
+| GP1 (I2C0 SCL) | DS3231 RTC Module   | SCL                 | I2C Bus 0 for Real-Time Clock            |
+| GP2 (SPI0 SCK) | MicroSD Card Module | SCK                 | SPI Bus 0 for SD Card                    |
+| GP3 (SPI0 MOSI)| MicroSD Card Module | MOSI                | SPI Bus 0 for SD Card                    |
+| GP4 (SPI0 MISO)| MicroSD Card Module | MISO                | SPI Bus 0 for SD Card                    |
+| GP5            | MicroSD Card Module | CS (Chip Select)    |                                          |
+| GP6 (I2C1 SDA) | ADS1115 ADC Module  | SDA                 | I2C Bus 1 for Analog-to-Digital Converter|
+| GP7 (I2C1 SCL) | ADS1115 ADC Module  | SCL                 | I2C Bus 1 for Analog-to-Digital Converter|
+| GP12 (UART0 TX)| Debugging           | TX                  | UART for debugging output                |
+| GP13 (UART0 RX)| Debugging           | RX                  | UART for debugging output                |
+| GP14          | DS18B20 STS         | Data                | One-Wire interface for temperature sensors|
+| GP15          | Function Toggle     | Switch Pin          | Toggles data recording ON/OFF            |
+| GP18          | Status LED          | Blue Cathode        |                                          |
+| GP19          | Status LED          | Green Cathode       |                                          |
+| GP20          | Status LED          | Red Cathode         |                                          |
+| GP21          | Power Control       | MOSFET Gate         | Switches power to sensors and modules    |
 
 ### Usage
 
