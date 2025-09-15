@@ -197,7 +197,7 @@ The following table details the default wiring connections between the Raspberry
                     │GP21─────┼──────────────┼── MOSFET Gate
                     │         │              │
                     │GND──────┼──────────────┼───┬───────────────── GND
-                    └─────────────────────────┘  │               │
+                    └────────────────────────┘   │               │
                                                  │         MOSFET IRFZ44N
                                                  │         ┌─────┐ │
                                                  │    Gate │  │  │ │
