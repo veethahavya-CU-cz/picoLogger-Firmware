@@ -159,20 +159,20 @@ The following table details the default wiring connections between the Raspberry
                  |       +------+  +-----+       |        |
                  |                               |        |
                  |                         VOUT(+)──┬─────┼─── To Schottky Diodes
-                 |          Voltage Divider     │    |        |
-                 |          R1=2.2kΩ           │    |        |
-                 |             │               │    |        |
-                 |             ├── ADS1115 CH0 │    |        |
-                 |             │               │    |        |
-                 |          R2=22kΩ           │    |        |
-                 |             │               │    |        |
-                 +──────────GND───────────VOUT(-)───┘        |
-                                              |        |
-                                    Schottky  |        |
-                                    Diodes ---|        |
-                                              |        |
-                    RASPBERRY PI PICO         |        |
-                    ┌─────────────────────────┐|        |
+                 |          Voltage Divider     │   |     |
+                 |          R1=2.2kΩ            │   |     |
+                 |             │                │   |     |
+                 |             ├── ADS1115 CH0  │   |     |
+                 |             │                │   |     |
+                 |          R2=22kΩ             │   |     |
+                 |             │                │   |     |
+                 +──────────GND───────────VOUT(-)───┘   __|
+                                               |       |
+                                    Schottky   |       |
+                                    Diodes ----|       |
+                                               |       |
+                    RASPBERRY PI PICO          |       |
+                    ┌─────────────────────────┐|       |
          SW1 ──────►│3V3_EN            VSYS  ├┘        |
                     │                        │         |
                     │3V3_OUT──┬──────────────┼─────────┼─── (+) Power Rail
@@ -197,14 +197,14 @@ The following table details the default wiring connections between the Raspberry
                     │GP21─────┼──────────────┼── MOSFET Gate
                     │         │              │
                     │GND──────┼──────────────┼───┬───────────────── GND
-                    └─────────────────────────┘   │               │
+                    └─────────────────────────┘  │               │
                                                  │         MOSFET IRFZ44N
                                                  │         ┌─────┐ │
                                                  │    Gate │  │  │ │
                                                  │    ◄────┤  │  │ │
                                                  │         │  │  │ │
                                     System GND ──┴── Source│  │  │Drain ── Switched GND Rail
-                                                          └─────┘     (ADS1115, DS3231,
+                                                           └─────┘     (ADS1115, DS3231,
                                                                        SD Card, LCSMS×3,
                                                                        DS18B20×3)
 
